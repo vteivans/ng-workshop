@@ -1,13 +1,15 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, Input } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { NoteInterface } from '../notes/note.interface';
+import { NotesService } from '../notes/notes.service';
 
 @Component({
   selector: 'note-note-form',
   template: `
-    <form (submit)="__close($event)">
+    <form (submit)="update($event, input)">
       <mat-form-field appearance="outline">
         <mat-label>Enter a Note</mat-label>
-        <textarea matInput mat-autosize [value]="data.value" placeholder="Placeholder"></textarea>
+        <textarea #input matInput mat-autosize [value]="data.text" placeholder="Placeholder"></textarea>
         <mat-hint>Enter some text</mat-hint>
       </mat-form-field>
       <br>
@@ -25,18 +27,19 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   }
   `]
 })
-export class NoteFormComponent implements OnInit {
+export class NoteFormComponent {
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    public dialogRef: MatDialogRef<NoteFormComponent>) {
+    @Inject(MAT_DIALOG_DATA) public data: NoteInterface,
+    public dialogRef: MatDialogRef<NoteFormComponent>,
+    private notesService: NotesService) {
   }
 
-  ngOnInit() {
-  }
-
-  __close(event) {
+  update(event, input) {
     event.preventDefault();
+    this.notesService.updateItem({id: this.data.id, text: input.value}).subscribe(updatedNote => {
+      console.log("note updated", updatedNote);
+    });
     this.dialogRef.close('done');
   }
 }

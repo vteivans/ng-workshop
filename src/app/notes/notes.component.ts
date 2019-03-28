@@ -15,7 +15,10 @@ import { BoardInterface } from '../boards/board.interface';
   <h2>{{ (this.currentBoard | async).name }}</h2>
   <div *ngFor="let note of notes | async" class="note-item">
     <p>{{ note.text }}</p>
-    <button mat-button (click)="__edit($event, note.id, note.text)"> Edit </button>
+    <div>
+      <button mat-button (click)="edit(note)"> Edit </button>
+      <button mat-button (click)="del(note)" color="warn"> Delete </button>
+    </div>
     <mat-divider [inset]="true"></mat-divider>
   </div>
   `,
@@ -63,13 +66,16 @@ export class NotesComponent implements OnInit {
     );
   }
 
-  __edit(event, id, text) {
+  edit(note: NoteInterface) {
     this.dialog.open(NoteFormComponent, {
-      data: {
-        value: text,
-      },
+      data: note,
       width: '500px'
     });
   }
 
+  del(note: NoteInterface) {
+    this.notesService.deleteItem(note.id).subscribe(deletedNote => {
+      console.log('Note deleted!', note);
+    });
+  }
 }

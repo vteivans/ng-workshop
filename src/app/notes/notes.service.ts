@@ -2,49 +2,64 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { NoteInterface } from './note.interface';
+import { switchMap, take, filter, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotesService {
+  state = new BehaviorSubject<NoteInterface[]>([]);
+  private init = new BehaviorSubject<boolean>(false);
 
-  state = new BehaviorSubject<NoteInterface[]>([
-    {
-      id: 1,
-      boardId: 1,
-      text: 'Some text'
-    },
-    {
-      id: 2,
-      boardId: 1,
-      text: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
-    },
-    {
-      id: 3,
-      boardId: 2,
-      text: 'Hello from the second board'
-    }
-  ]);
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getState(id?: string|number) {
+    this.init.pipe(
+      take(1),
+      filter(val => val === false),
+      switchMap(() => this.http.get<NoteInterface[]>('/api/notes'))
+    ).subscribe(notes => {
+      this.init.next(true);
+      this.state.next(notes);
+    });
     return this.state;
-    // if (id) {
-    //   return this.http.get(`/api/notes/${id}`);
-    // }
-    // return this.http.get('/api/notes');
   }
 
-  createItem(note) {
-    return this.http.post('/api/notes', note);
+  createItem(note: Partial<NoteInterface>) {
+    return this.init.pipe(
+      take(1),
+      switchMap(() => this.http.post<NoteInterface>('/api/notes', note)),
+      tap(newNote => {
+        const existingNotes = this.state.getValue();
+        this.state.next([...existingNotes, newNote]);
+      })
+    );
   }
 
-  updateItem(note) {
-    return this.http.put(`/api/notes/${note.id}`, note);
+  updateItem(note: Partial<NoteInterface>) {
+    return this.init.pipe(
+      take(1),
+      switchMap(() => this.http.put<NoteInterface>(`/api/notes/${note.id}`, note)),
+      tap(updatedNote => {
+        const existingNotes = this.state.getValue();
+        this.state.next(existingNotes.map(existingNote => {
+          if (+existingNote.id === +updatedNote.id) {
+            return updatedNote;
+          }
+          return existingNote;
+        }));
+      })
+    );
   }
 
   deleteItem(id) {
-    return this.http.delete(`/api/notes/${id}`);
+    return this.init.pipe(
+      take(1),
+      switchMap(() => this.http.delete<NoteInterface>(`/api/notes/${id}`)),
+      tap(deletedNote => {
+        const existingNotes = this.state.getValue();
+        this.state.next(existingNotes.filter(existingNote => +existingNote.id !== +deletedNote.id));
+      })
+    );
   }
 }

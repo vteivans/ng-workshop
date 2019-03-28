@@ -4,6 +4,10 @@ import { NoteFormComponent } from './note-form/note-form.component';
 import { Observable } from 'rxjs';
 import { BoardInterface } from './boards/board.interface';
 import { ActivatedRoute } from '@angular/router';
+import { AppService } from './app.service';
+import { NotesService } from './notes/notes.service';
+import { BoardsService } from './boards/boards.service';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'note-root',
@@ -12,10 +16,10 @@ import { ActivatedRoute } from '@angular/router';
     <h1 class="mat-h1">Notes</h1>
     <mat-card>
       <div class="sidebar">
-        <form action="">
+        <form (submit)="createNote($event, text)">
           <mat-form-field appearance="outline">
             <mat-label>Enter a Note</mat-label>
-            <textarea matInput mat-autosize placeholder="Placeholder"></textarea>
+            <textarea #text matInput mat-autosize placeholder="Placeholder"></textarea>
             <mat-hint>Enter some text</mat-hint>
           </mat-form-field>
           <br>
@@ -71,19 +75,37 @@ import { ActivatedRoute } from '@angular/router';
     }
   `]
 })
-export class AppComponent implements OnInit{
+export class AppComponent {
   title = 'note-app';
-  // currentBoard = Observable<BoardInterface>;
 
   constructor(
     private route: ActivatedRoute,
+    private service: AppService,
+    private notesService: NotesService,
+    private boardsService: BoardsService,
     private http: HttpClient) {
   }
 
-  ngOnInit() {
-    // this.currentBoard = this.route.params.subscribe()
-    this.route.params.subscribe((x) => {
-      console.log(x);
+  createNote(event, input) {
+    event.preventDefault();
+    if (!input.value) {
+      return;
+    }
+    const boardId = this.service.getCurrentBoard();
+
+    if (boardId) {
+      this.notesService.createItem({text: input.value, boardId}).subscribe(note => {
+        input.value = '';
+      });
+      return;
+    }
+
+    this.boardsService.getState().pipe(
+      switchMap(boards => {
+        return this.notesService.createItem({text: input.value, boardId: boards[0].id});
+      })
+    ).subscribe(note => {
+      input.value = '';
     });
   }
 }
