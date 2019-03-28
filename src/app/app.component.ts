@@ -1,31 +1,109 @@
 import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { MatDialog } from '@angular/material';
+import { NoteFormComponent } from './note-form/note-form.component';
 
 @Component({
   selector: 'note-root',
   template: `
-    <!--The content below is only a placeholder and can be replaced.-->
-    <div style="text-align:center">
-      <h1>
-        Welcome to {{title}}!
-      </h1>
-      <img width="300" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-    </div>
-    <h2>Here are some links to help you start: </h2>
-    <ul>
-      <li>
-        <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-      </li>
-      <li>
-        <h2><a target="_blank" rel="noopener" href="https://angular.io/cli">CLI Documentation</a></h2>
-      </li>
-      <li>
-        <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-      </li>
-    </ul>
-    <router-outlet></router-outlet>
+    <main>
+    <h1 class="mat-h1">Notes</h1>
+    <mat-card>
+      <div class="sidebar">
+      <form action="">
+        <mat-form-field appearance="outline">
+          <mat-label>Enter a Note</mat-label>
+          <textarea matInput mat-autosize placeholder="Placeholder"></textarea>
+          <mat-hint>Enter some text</mat-hint>
+        </mat-form-field>
+        <br>
+        <button mat-raised-button color="primary">Create</button>
+      </form>
+      <br>
+      <mat-divider [inset]="true"></mat-divider>
+      <mat-nav-list>
+        <mat-list-item>
+           <a matLine href="/1">Quick notes</a>
+        </mat-list-item>
+        <mat-list-item>
+           <a matLine href="/2">Other</a>
+        </mat-list-item>
+      </mat-nav-list>
+      </div>
+
+      <section>
+        <h2>first</h2>
+        <div class="note-item">
+          <p style="width: 100%"> Some text </p>
+          <button mat-button (click)="__edit($event, 'Some text')"> Edit </button>
+          <mat-divider [inset]="true"></mat-divider>
+        </div>
+        <div class="note-item">
+          <p style="width: 100%"> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. </p>
+          <button mat-button (click)="__edit($event, 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.')"> Edit </button>
+          <mat-divider [inset]="true"></mat-divider>
+        </div>
+        <router-outlet></router-outlet>
+      </section>
+
+    </mat-card>
+    <main>
   `,
-  styles: []
+  styles: [`
+    main {
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 1024px;
+    }
+    mat-card {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+    }
+    .sidebar {
+      width: 300px;
+      opacity: .6;
+      flex-shrink: 0;
+      margin-right: 20px;
+    }
+    section {
+      opacity: .6;
+      width: 100%;
+      flex-grow: 1;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    form mat-form-field {
+      width: 100%;
+    }
+    .note-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    .add-button {
+      width: 100%;
+    }
+  `]
 })
 export class AppComponent {
   title = 'note-app';
+
+  constructor(
+    public dialog: MatDialog,
+    private http: HttpClient) {
+  }
+
+  __edit(event, text) {
+    this.dialog.open(NoteFormComponent, {
+      data: {
+        value: text,
+      },
+      width: '500px'
+    });
+  }
 }
