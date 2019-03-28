@@ -7,9 +7,7 @@ import { BoardInterface } from './board.interface';
   selector: 'note-boards',
   template: `
     <mat-nav-list>
-      <mat-list-item *ngFor="let board of boards | async">
-         <a matLine [routerLink]="[board.id]">{{ board.name }}</a>
-      </mat-list-item>
+      <a mat-list-item *ngFor="let board of boards | async" [routerLink]="[board.id]">{{ board.name }}</a>
     </mat-nav-list>
   `,
   styles: []
