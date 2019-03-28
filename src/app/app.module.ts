@@ -16,11 +16,13 @@ import {MatListModule} from '@angular/material/list';
 import {MatDividerModule} from '@angular/material/divider';
 import { NoteFormComponent } from './note-form/note-form.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { BoardsComponent } from './boards/boards.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    NoteFormComponent
+    NoteFormComponent,
+    BoardsComponent
   ],
   imports: [
     BrowserModule,

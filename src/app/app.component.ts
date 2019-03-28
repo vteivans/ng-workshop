@@ -10,25 +10,18 @@ import { NoteFormComponent } from './note-form/note-form.component';
     <h1 class="mat-h1">Notes</h1>
     <mat-card>
       <div class="sidebar">
-      <form action="">
-        <mat-form-field appearance="outline">
-          <mat-label>Enter a Note</mat-label>
-          <textarea matInput mat-autosize placeholder="Placeholder"></textarea>
-          <mat-hint>Enter some text</mat-hint>
-        </mat-form-field>
+        <form action="">
+          <mat-form-field appearance="outline">
+            <mat-label>Enter a Note</mat-label>
+            <textarea matInput mat-autosize placeholder="Placeholder"></textarea>
+            <mat-hint>Enter some text</mat-hint>
+          </mat-form-field>
+          <br>
+          <button mat-raised-button color="primary">Create</button>
+        </form>
         <br>
-        <button mat-raised-button color="primary">Create</button>
-      </form>
-      <br>
-      <mat-divider [inset]="true"></mat-divider>
-      <mat-nav-list>
-        <mat-list-item>
-           <a matLine href="/1">Quick notes</a>
-        </mat-list-item>
-        <mat-list-item>
-           <a matLine href="/2">Other</a>
-        </mat-list-item>
-      </mat-nav-list>
+        <mat-divider [inset]="true"></mat-divider>
+        <note-boards></note-boards>
       </div>
 
       <section>
