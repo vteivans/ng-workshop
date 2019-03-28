@@ -67,9 +67,9 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     const collection: any[] = JSON.parse(localStorage.getItem(key)) || [];
     const id = collection.reduce((maxId, item) => {
       return Math.max(parseInt(item.id, 10), maxId);
-    }, 1);
+    }, 0);
 
-    const newItem = {...data, id};
+    const newItem = {...data, id: id + 1};
 
     collection.push(newItem);
     localStorage.setItem(key, JSON.stringify(collection));
